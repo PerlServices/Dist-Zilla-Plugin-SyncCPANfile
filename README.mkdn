@@ -8,7 +8,7 @@ Dist::Zilla::Plugin::SyncCPANfile - Sync a cpanfile with the prereqs listed in d
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
