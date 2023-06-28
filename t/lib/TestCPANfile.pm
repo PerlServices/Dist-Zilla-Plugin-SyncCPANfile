@@ -82,7 +82,9 @@ sub skip_without_encoding {
 
 sub build_dist {
     my @prereqs = @{ shift || [] };
-    my $config  = shift || { filename => 'cpanfile' };
+    my $config  = shift || {};
+
+    $config->{filename} ||= 'cpanfile';
 
     my $test   = {
         content => 'requires Moo => 1;',
