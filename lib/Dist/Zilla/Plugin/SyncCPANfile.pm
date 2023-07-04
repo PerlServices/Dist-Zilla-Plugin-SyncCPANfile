@@ -82,8 +82,25 @@ sub _get_cpanfile {
             for my $module ( sort $req->required_modules ) {
                 my $version = $req->requirements_for_module( $module ) || 0;
 
+                my ($min_version, $advisories);
+
                 if ( $self->cpan_audit ) {
-                    my $min_version            = _audit( $audit, $module, $version );
+                    ($min_version, $advisories) = _audit( $audit, $module, $version );
+                }
+
+                if ( $advisories && $version =~ m{(>|<|>=|<=|!=|==)}  ) {
+
+                    # this seems to be a version range, so check if the latest fixed version would be accepted
+                    if ( defined $min_version && !$req->accepts_module( $module, $min_version ) ) {
+                        $self->log( "Range '$version' for $module does not include latest fixed version ($min_version)!" );
+                    }
+                    elsif ( defined $min_version ) {
+                        $self->log( "Current version range includes vulnerable versions. Consider updating the minimum to $min_version" ) #if $affected_version_allowed;
+                    }
+                }
+                elsif ( $advisories ) {
+
+                    # this branch is used when no version range is given but a version number
                     my $vuln_version_requested = $min_version && (
                         version->new( $version ) < version->new( $min_version )
                     );
@@ -115,9 +132,10 @@ sub _audit {
 
     my $result        = $audit->command( 'module', $module, $version );
     my ($module_data) = values %{ $result->{dists} || {} };
+    my @advisories    = @{ $module_data->{advisories} || [] };
 
     my @versions;
-    for my $advisory ( @{ $module_data->{advisories} || [] } ) {
+    for my $advisory ( @advisories ) {
         my ($fixed_version) = ( $advisory->{fixed_versions} // '' ) =~ m{(v?[0-9]+(?:\.[0-9]+){0,2})};
         next if !$fixed_version;
 
@@ -125,8 +143,8 @@ sub _audit {
         push @versions, $version_object;
     }
 
-    my ($min_version) = sort { $a <=> $b } @versions;
-    return $min_version;
+    my ($min_version) = sort { $b <=> $a } @versions;
+    return ( $min_version, scalar @advisories );
 }
 
 __PACKAGE__->meta->make_immutable;
