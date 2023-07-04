@@ -1,6 +1,6 @@
 [![Kwalitee status](https://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-SyncCPANfile.png)](https://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-SyncCPANfile)
 [![GitHub issues](https://img.shields.io/github/issues/perlservices/Dist-Zilla-Plugin-SyncCPANfile.svg)](https://github.com/perlservices/Dist-Zilla-Plugin-SyncCPANfile/issues)
-[![CPAN Cover Status](https://cpancoverbadge.perl-services.de/Dist-Zilla-Plugin-SyncCPANfile-0.03)](https://cpancoverbadge.perl-services.de/Dist-Zilla-Plugin-SyncCPANfile-0.03)
+[![CPAN Cover Status](https://cpancoverbadge.perl-services.de/Dist-Zilla-Plugin-SyncCPANfile-0.04)](https://cpancoverbadge.perl-services.de/Dist-Zilla-Plugin-SyncCPANfile-0.04)
 [![Cpan license](https://img.shields.io/cpan/l/Dist-Zilla-Plugin-SyncCPANfile.svg)](https://metacpan.org/release/Dist-Zilla-Plugin-SyncCPANfile)
 
 # NAME
@@ -9,7 +9,7 @@ Dist::Zilla::Plugin::SyncCPANfile - Sync a cpanfile with the prereqs listed in d
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # SYNOPSIS
 
