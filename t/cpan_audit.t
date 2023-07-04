@@ -24,6 +24,7 @@ sub test_cpanfile {
     my $desc    = shift;
     my $prereqs = shift;
     my $config  = shift;
+    my $tests   = shift;
     my $test    = build_dist( clone( $prereqs ), $config);
 
     my $content = $test->{cpanfile}->slurp_raw;
@@ -31,21 +32,47 @@ sub test_cpanfile {
 
     like $content, qr/"ExtUtils::MakeMaker"\s+=>\s+"?(?!0)/;
 
-    my ($version) =  $content =~ m/"ExtUtils::MakeMaker"\s+=>\s+"?[0-9]+/;
+    my ($version) =  $content =~ m/"ExtUtils::MakeMaker"\s+=>\s+"?([0-9]+)/;
     cmp_ok $version, '>', 0;
 
-    like $log, qr/Mojo::File 8 is vulnerable/;
+    for my $regex_test ( @{ $tests || [] } ) {
+        for my $regex ( @{ $regex_test->{content} || [] } ) {
+            like $content, $regex, "$regex matches content";
+        }
+
+        for my $regex ( @{ $regex_test->{log} || [] } ) {
+            like $log, $regex, "$regex matches log";
+        }
+    }
 }
 
 test_cpanfile
-  'change cpanfile name - simple prereq',
+  'cpan_audit - simple prereq',
   [
       Prereqs => [
           'Mojo::File' => 8,
           'ExtUtils::MakeMaker' => 0,
       ]
   ],
-  { cpan_audit => 1 }
+  { cpan_audit => 1 },
+  [
+      { log => [ qr/Mojo::File 8 is vulnerable/ ] },
+  ]
+;
+
+test_cpanfile
+  'cpan_audit - version range excludes fixed version',
+  [
+      Prereqs => [
+          'Mojo::File' => ">8.1,<9.1",
+          'ExtUtils::MakeMaker' => 0,
+      ]
+  ],
+  { cpan_audit => 1 },
+  [
+      { content => [ qr/"Mojo::File" => "> 8.1, < 9.1"/ ] },
+      { log     => [ qr/Range '> 8.1, < 9.1' for Mojo::File does not include latest fixed version/ ] },
+  ]
 ;
 
 done_testing;
