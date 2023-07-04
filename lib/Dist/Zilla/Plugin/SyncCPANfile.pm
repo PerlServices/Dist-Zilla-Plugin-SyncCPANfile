@@ -7,6 +7,8 @@ package Dist::Zilla::Plugin::SyncCPANfile;
 use strict;
 use warnings;
 
+# VERSION
+
 use version;
 
 use Moose;
